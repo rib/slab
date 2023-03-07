@@ -413,6 +413,32 @@ impl<T> Slab<T> {
         self.entries.shrink_to_fit();
     }
 
+    /// Return the current length of entry storage
+    ///
+    /// This is always larger than all currently valid keys and less than or
+    /// equal to the current capacity.
+    ///
+    /// This may be useful for maintaining secondary data within vectors that
+    /// use the same keys as a primary Slab.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use slab::*;
+    /// let mut slab = Slab::with_capacity(10);
+    ///
+    /// for i in 0..4 {
+    ///     slab.insert(i);
+    /// }
+    ///
+    /// slab.remove(0);
+    /// slab.remove(3);
+    /// assert_eq!(slab.key_watermark(), 4);
+    /// ```
+    pub fn key_watermark(&self) -> usize {
+        self.entries.len()
+    }
+
     /// Iterate through all entries to recreate and repair the vacant list.
     /// self.len must be correct and is not modified.
     fn recreate_vacant_list(&mut self) {
